@@ -43,7 +43,6 @@ const CivicSphereLanding = () => {
         </div>
       </div>
 
-      {/* Curved bottom border */}
       <div className="absolute bottom-0 left-0 w-full">
         <svg viewBox="0 0 1440 100" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M0 100H1440V40C1080 120 360 0 0 80V100Z" fill="white" />
