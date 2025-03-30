@@ -1,7 +1,9 @@
 import React from 'react';
 import { Search, MessageCircle, User, ChevronDown, ChevronRight, Facebook, Twitter, Instagram } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const CivicSphereHomepage = () => {
+  const navigate=useNavigate();
   return (
     <div className="bg-white min-h-screen">
       <header className="py-4 px-6 flex items-center justify-between">
@@ -71,7 +73,7 @@ const CivicSphereHomepage = () => {
           <div className="max-w-md">
             <h2 className="text-2xl font-bold text-[#220440] mb-2 text-left">Need a Hand?</h2>
             <p className="text-gray-700 mb-6 text-left">Let us find you a skilled worker. <br /> Post a request now!</p>
-            <button className="bg-[#220440] text-white font-medium py-2 rounded-[14px] h-[55px] w-[174px] mr-[140px]">
+            <button className="bg-[#220440] text-white font-medium py-2 rounded-[14px] h-[55px] w-[174px] mr-[140px]" onClick={()=>{navigate("/needahand")}}>
               POST NOW
             </button>
           </div>
