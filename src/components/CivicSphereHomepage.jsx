@@ -6,17 +6,18 @@ const CivicSphereHomepage = () => {
     <div className="bg-white min-h-screen">
       <header className="py-4 px-6 flex items-center justify-between">
         <div className="flex items-center">
+          
           <div className="mr-2">
-          <div className="mr-2">
-              <img src={"./image.png"} alt="CivicSphere Logo" className="w-[78px] h-[78px] mt-[46px]" />
+                <img src={"./image.png"} alt="CivicSphere Logo" className="w-[78px] h-[78px] mt-[46px]" />
           </div>
-          </div>
+
           <h1 className="text-3xl font-bold mt-[46px]">
             <span className="text-black">Civic</span>
             <span className="bg-gradient-to-r from-[#220440] via-[#4F1E4F] to-[#7B375D] bg-clip-text text-transparent">
                   Sphere
             </span>
           </h1>
+
         </div>
         
         <div className="flex items-center  mt-[61px]">
@@ -70,7 +71,7 @@ const CivicSphereHomepage = () => {
           <div className="max-w-md">
             <h2 className="text-2xl font-bold text-[#220440] mb-2 text-left">Need a Hand?</h2>
             <p className="text-gray-700 mb-6 text-left">Let us find you a skilled worker. <br /> Post a request now!</p>
-            <button className="bg-purple-900 text-black font-medium py-2 rounded h-[55px] w-[174px]">
+            <button className="bg-[#220440] text-white font-medium py-2 rounded-[14px] h-[55px] w-[174px] mr-[140px]">
               POST NOW
             </button>
           </div>
@@ -182,7 +183,7 @@ const CivicSphereHomepage = () => {
             <p className="text-gray-500 text-sm mb-3 text-left">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore
             </p>
-            <a href="#" className="text-sm text-purple-900">Learn more</a>
+            <a href="#" className="text-sm text-[#220440]">Learn more</a>
           </div>
           
           <div className='mt-[80px]'>
@@ -211,16 +212,34 @@ const CivicSphereHomepage = () => {
           </div>
           
           <div className='mt-[80px]'>
-            <h3 className="text-[#220440] uppercase text-xs font-medium mb-4">GET OUR APP</h3>
-            <div className="space-y-2">
-              <a href="#" className="block">
-                <img src="/api/placeholder/150/50" alt="Google Play" className="h-10" />
-              </a>
-              <a href="#" className="block">
-                <img src="/api/placeholder/150/50" alt="App Store" className="h-10" />
-              </a>
-            </div>
-          </div>
+              <h3 className="text-[#220440] uppercase text-xs mb-4 font-bold">GET OUR APP</h3>
+              <div className="space-y-2 ml-16">
+                  <a href="#" className="block">
+                  <div className="rounded-[12px] w-[134px] h-[42px] bg-black text-white flex items-center justify-around">
+                      <div>
+                          <img src="./googleplay.svg" alt="" />
+                      </div>
+                      <div>
+                          <span>Get it on</span> 
+                          <br />
+                          <span>GooglePlay</span>
+                      </div>
+                  </div>
+                  </a>
+                  <a href="#" className="block">
+                  <div className="rounded-[12px] w-[134px] h-[42px] bg-black text-white flex items-center justify-around">
+                      <div>
+                          <img src="./googleplay.svg" alt="" />
+                      </div>
+                      <div>
+                          <span>Download on</span> 
+                          <br />
+                          <span>App Store</span>
+                      </div>
+                    </div>
+                    </a>
+                  </div>
+                </div>
         </div>
       </footer>
     </div>
