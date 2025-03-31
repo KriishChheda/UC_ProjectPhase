@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { ChevronDown, Search, MessageCircle, User, Mail, Plus } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const UserProfilePage = () => {
+  const navigate=useNavigate();
   const [profileData, setProfileData] = useState({
     fullName: 'Alexa Rawles',
     nickName: '',
@@ -10,14 +12,25 @@ const UserProfilePage = () => {
     country: '',
     language: '',
     timeZone: '',
-    profilePicture: './user-profile.jpg',
+    profilePicture: './image8.png',
     lastUpdated: '1 month ago'
   });
 
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  
+    useEffect(() => {
+      const handleClickOutside = (event) => {
+        if (!event.target.closest('.user-menu')) {
+          setIsUserMenuOpen(false);
+        }
+      };
+  
+      document.addEventListener('click', handleClickOutside);
+      return () => document.removeEventListener('click', handleClickOutside);
+    }, []);
+  
   const [isEditing, setIsEditing] = useState(false);
 
-  // only when isEditing is true can you edit the form , else you will not be able to edit the form 
-  // Handle input changes
   const handleInputChange = (field, value) => {
     setProfileData({
       ...profileData,
@@ -25,25 +38,23 @@ const UserProfilePage = () => {
     });
   };
 
-  // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
     setIsEditing(false);
-    // Here you would typically save data to backend
+    // Here We will save data to backend
   };
 
-  // Toggle edit mode
   const toggleEditMode = () => {
     setIsEditing(!isEditing);
   };
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
-       <header className="py-4 px-6 flex items-center justify-between">
+      <header className="py-4 px-6 flex items-center justify-between">
         <div className="flex items-center">
           
           <div className="mr-2">
-                <img src={"./image.png"} alt="CivicSphere Logo" className="w-[78px] h-[78px] mt-[46px]" />
+                <img src="./image.png" alt="CivicSphere Logo" className="w-[78px] h-[78px] mt-[46px]" />
           </div>
 
           <h1 className="text-3xl font-bold mt-[46px]">
@@ -61,7 +72,7 @@ const UserProfilePage = () => {
             <ChevronDown size={18} />
           </div>
           
-          <div className="bg-gray-200 rounded-full px-4 flex items-center w-[474px] h-[68px]">
+          <div className="bg-gray-200 rounded-full px-4 flex items-center w-[460px] h-[55px]">
             <input 
               type="text" 
               className="bg-transparent outline-none w-full" 
@@ -70,17 +81,24 @@ const UserProfilePage = () => {
             <Search size={20} className="text-gray-500" />
           </div>
           
-          <div className="flex items-center space-x-3 ">
+          <div className="flex items-center space-x-3 user-menu">
             <button className="p-2 rounded-full bg-gray-200  ml-[10px]">
               <MessageCircle size={20} className="text-gray-500" />
             </button>
-            <button className="p-2 rounded-full bg-gray-200">
+            <button className="p-2 rounded-full bg-gray-200" onClick={()=>{setIsUserMenuOpen(!isUserMenuOpen)}}>
               <User size={20} className="text-gray-500" />
             </button>
+            {isUserMenuOpen && (
+              <div className="absolute right-1 mt-2 w-44 bg-white shadow-lg rounded-lg p-2 border border-gray-200 transform translate-y-2 transition-all duration-200">
+                  <a href="#" className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg" onClick={()=>{navigate("/userprofile")}}>Profile</a>
+                  <a href="#" className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg">My Jobs</a>
+                  <a href="#" className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg">Settings</a>
+                  <a href="#" className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg">Logout</a>
+              </div>
+            )}
           </div>
         </div>
       </header>
-    
       <div className="h-24 bg-gradient-to-r from-[#220440] via-[#4F1E4F] to-[#7B375D]"></div>
 
       <div className="container mx-auto px-4 py-6">

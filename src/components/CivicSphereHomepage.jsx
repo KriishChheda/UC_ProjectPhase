@@ -1,17 +1,34 @@
 // This is User home page
 import React from 'react';
+import { useState , useEffect} from 'react';
 import { Search, MessageCircle, User, ChevronDown, ChevronRight, Facebook, Twitter, Instagram } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
+
 const CivicSphereHomepage = () => {
   const navigate=useNavigate();
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest('.user-menu')) {
+        setIsUserMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
+
+
   return (
     <div className="bg-white min-h-screen">
       <header className="py-4 px-6 flex items-center justify-between">
         <div className="flex items-center">
           
           <div className="mr-2">
-                <img src={"./image.png"} alt="CivicSphere Logo" className="w-[78px] h-[78px] mt-[46px]" />
+                <img src="./image.png" alt="CivicSphere Logo" className="w-[78px] h-[78px] mt-[46px]" />
           </div>
 
           <h1 className="text-3xl font-bold mt-[46px]">
@@ -29,7 +46,7 @@ const CivicSphereHomepage = () => {
             <ChevronDown size={18} />
           </div>
           
-          <div className="bg-gray-200 rounded-full px-4 flex items-center w-[474px] h-[68px]">
+          <div className="bg-gray-200 rounded-full px-4 flex items-center w-[460px] h-[55px]">
             <input 
               type="text" 
               className="bg-transparent outline-none w-full" 
@@ -38,13 +55,21 @@ const CivicSphereHomepage = () => {
             <Search size={20} className="text-gray-500" />
           </div>
           
-          <div className="flex items-center space-x-3 ">
+          <div className="flex items-center space-x-3 user-menu">
             <button className="p-2 rounded-full bg-gray-200  ml-[10px]">
               <MessageCircle size={20} className="text-gray-500" />
             </button>
-            <button className="p-2 rounded-full bg-gray-200">
+            <button className="p-2 rounded-full bg-gray-200" onClick={()=>{setIsUserMenuOpen(!isUserMenuOpen)}}>
               <User size={20} className="text-gray-500" />
             </button>
+            {isUserMenuOpen && (
+              <div className="absolute right-1 mt-2 w-44 bg-white shadow-lg rounded-lg p-2 border border-gray-200 transform translate-y-2 transition-all duration-200">
+                  <a href="#" className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg" onClick={()=>{navigate("/userprofile")}}>Profile</a>
+                  <a href="#" className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg">My Jobs</a>
+                  <a href="#" className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg">Settings</a>
+                  <a href="#" className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg">Logout</a>
+              </div>
+            )}
           </div>
         </div>
       </header>
@@ -52,19 +77,19 @@ const CivicSphereHomepage = () => {
     <div className="py-12 flex justify-around">
       <div className="grid grid-cols-5 gap-4 max-w-5xl items-center text-center">
           <div className="rounded-2xl overflow-hidden h-[204.05px] w-[143px]">
-              <img src="/api/placeholder/100/150" alt="Electrical services" className="h-full w-full object-cover" />
+              <img src="./image1.png" className="h-full w-full object-cover" />
           </div>
           <div className="rounded-2xl overflow-hidden h-[244px] w-[165px]">
-              <img src="/api/placeholder/100/150" alt="Cleaning services" className="h-full w-full object-cover" />
+              <img src="./image2.png" className="h-full w-full object-cover" />
           </div>
           <div className="rounded-3xl overflow-hidden h-[330px] w-[180px]">
-              <img src="/api/placeholder/150/250" alt="Carpentry services" className="h-full w-full object-cover" />
+              <img src="./image3.png" className="h-full w-full object-cover" />
           </div>
           <div className="rounded-2xl overflow-hidden h-[244px] w-[165px]">
-              <img src="/api/placeholder/100/150" alt="Plumbing services" className="h-full w-full object-cover" />
+              <img src="./image4.png" alt="Plumbing services" className="h-full w-full object-cover" />
           </div>
           <div className="rounded-2xl overflow-hidden h-[204.05px] w-[143px]">
-              <img src="/api/placeholder/100/150" alt="repair services" className="h-full w-full object-cover" />
+              <img src="./image5.png" alt="repair services" className="h-full w-full object-cover" />
           </div>
       </div>
    </div>
@@ -79,7 +104,7 @@ const CivicSphereHomepage = () => {
             </button>
           </div>
           <div className="w-64 mr-[150px]">
-            <img src="/api/placeholder/250/200" alt="Person peeking" className="w-full" />
+            <img src="./image6.png" alt="Person peeking" className="w-full" />
           </div>
         </div>
       </div>
@@ -95,7 +120,7 @@ const CivicSphereHomepage = () => {
                   <div className="flex space-x-4 w-[376px] border-black">
 
                     <div className="w-16 h-16 rounded-xl overflow-hidden">
-                      <img src="/api/placeholder/100/100" alt="Worker profile" className="w-full h-full object-cover" />
+                      <img src="./image7.png" alt="Worker profile" className="w-full h-full object-cover" />
                     </div>
 
                     <div>
@@ -137,7 +162,7 @@ const CivicSphereHomepage = () => {
                   <div className="flex space-x-4 w-[376px] border-black">
 
                     <div className="w-16 h-16 rounded-xl overflow-hidden">
-                      <img src="/api/placeholder/100/100" alt="Worker profile" className="w-full h-full object-cover" />
+                      <img src="./image7.png" alt="Worker profile" className="w-full h-full object-cover" />
                     </div>
 
                     <div>
@@ -193,7 +218,7 @@ const CivicSphereHomepage = () => {
             <h3 className="text-[#220440] uppercase text-xs font-medium mb-4">NAVIGATION</h3>
             <ul className="space-y-3 text-gray-400">
               <li><a href="#" >Home</a></li>
-              <li><a href="#" >Post Request</a></li>
+              <li><a href="#" onClick={()=>{navigate("/needahand")}} >Post Request</a></li>
               <li><a href="#" onClick={()=>{navigate("/usermessage")}} >Chat</a></li>
               <li><a href="#" >My Jobs</a></li>
             </ul>
