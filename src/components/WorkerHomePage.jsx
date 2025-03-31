@@ -1,7 +1,11 @@
+//This is worker home page
 import React from 'react';
 import { Search, MessageCircle, User, ChevronDown, ChevronRight, Facebook, Twitter, Instagram } from 'lucide-react';
 // import googleplay from "../assets/googleplay.svg"
+
+import { useNavigate } from 'react-router-dom';
 const WorkerHomePage= () => {
+    const navigate=useNavigate();
   return (
     <div className="max-w-screen-xl mx-auto">
       <header className="py-4 px-6 flex items-center justify-between">
@@ -123,7 +127,7 @@ const WorkerHomePage= () => {
                   <ul className="space-y-3 text-gray-400">
                     <li><a href="#" >Home</a></li>
                     <li><a href="#" >Post Request</a></li>
-                    <li><a href="#" >Chat</a></li>
+                    <li><a href="#" onClick={()=>{navigate("/workermessage")}} >Chat</a></li>
                     <li><a href="#" >My Jobs</a></li>
                   </ul>
                 </div>

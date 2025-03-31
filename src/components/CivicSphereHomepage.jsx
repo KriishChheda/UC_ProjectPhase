@@ -1,3 +1,4 @@
+// This is User home page
 import React from 'react';
 import { Search, MessageCircle, User, ChevronDown, ChevronRight, Facebook, Twitter, Instagram } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -193,7 +194,7 @@ const CivicSphereHomepage = () => {
             <ul className="space-y-3 text-gray-400">
               <li><a href="#" >Home</a></li>
               <li><a href="#" >Post Request</a></li>
-              <li><a href="#" >Chat</a></li>
+              <li><a href="#" onClick={()=>{navigate("/usermessage")}} >Chat</a></li>
               <li><a href="#" >My Jobs</a></li>
             </ul>
           </div>
