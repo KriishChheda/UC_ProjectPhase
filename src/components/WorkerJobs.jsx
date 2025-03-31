@@ -2,7 +2,7 @@ import React, { useState,useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronDown, Search, MessageCircle, User } from "lucide-react";
 
-const CivicSphereJobs = () => {
+const WorkerJobs = () => {
   // State for job listings and selected job
   const [selectedJob, setSelectedJob] = useState(null);
   const navigate=useNavigate();
@@ -180,49 +180,11 @@ const CivicSphereJobs = () => {
 
         {/* Main Area - Job Details */}
         <div className="flex flex-col flex-1 p-6">
-          <h2 className="text-2xl font-bold mb-4">Fix My Sink</h2>
           
-          <div className="flex mb-4">
-            <div className="flex items-center mr-8">
-              <svg className="w-5 h-5 mr-2 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-              </svg>
-              <span className="text-sm text-gray-600">Lorem ipsum dolor sit amet, consectetuer adipiscing elit.</span>
-            </div>
-            
-            <div className="flex items-center">
-              <svg className="w-5 h-5 mr-2 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-              <span className="text-sm text-gray-600">17:00 | 27 Feb 2025</span>
-            </div>
-          </div>
-          
-          {/* Service Providers */}
-          <div className="grid grid-cols-3 gap-6 mt-8">
-            {serviceProviders.map((provider) => (
-              <div key={provider.id} className="bg-white rounded-lg shadow overflow-hidden">
-                <div className="h-36 flex items-center justify-center border-t-[1px] border-l-[1px] border-r-[1px] rounded-t-[17px]">
-                  <img src={"./image7.png"} alt={provider.name} className="h-full object-cover" />
-                </div>
-                <div className="p-4 border-b-[1px] border-l-[1px] border-r-[1px] rounded-b-[17px]">
-                  <h3 className="text-center font-medium mb-1">{provider.name}</h3>
-                  <p className="text-center text-sm text-gray-600 mb-2">{provider.profession}</p>
-                  <div className="flex justify-center mb-3">
-                    {renderStars(provider.rating)}
-                  </div>
-                  <div className="flex justify-between mt-4">
-                    <button className="px-4 py-1 text-sm border border-gray-300 rounded-[5px]">Chat</button>
-                    <button className="px-4 py-1 text-sm text-white bg-[#220440] rounded-[5px]">Hire Now</button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
       </div>
     </div>
   );
 };
 
-export default CivicSphereJobs;
+export default WorkerJobs;

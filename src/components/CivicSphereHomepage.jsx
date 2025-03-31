@@ -4,12 +4,20 @@ import { useState , useEffect} from 'react';
 import { Search, MessageCircle, User, ChevronDown, ChevronRight, Facebook, Twitter, Instagram } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-
 const CivicSphereHomepage = () => {
   const navigate=useNavigate();
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
 
+  const [rotatedImages, setRotatedImages] = useState([
+    "./image1.png",
+    "./image2.png",
+    "./image3.png",
+    "./image4.png",
+    "./image5.png"
+  ]);
+
+  
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (!event.target.closest('.user-menu')) {
@@ -19,6 +27,17 @@ const CivicSphereHomepage = () => {
 
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setRotatedImages((prevImages) => {
+        const newImages = [...prevImages];
+        newImages.push(newImages.shift());
+        return newImages;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
   }, []);
 
 
@@ -46,7 +65,7 @@ const CivicSphereHomepage = () => {
             <ChevronDown size={18} />
           </div>
           
-          <div className="bg-gray-200 rounded-full px-4 flex items-center w-[460px] h-[55px]">
+          <div className="bg-gray-200 rounded-full px-4 flex items-center w-[430px] h-[40px]">
             <input 
               type="text" 
               className="bg-transparent outline-none w-full" 
@@ -65,7 +84,7 @@ const CivicSphereHomepage = () => {
             {isUserMenuOpen && (
               <div className="absolute right-1 mt-2 w-44 bg-white shadow-lg rounded-lg p-2 border border-gray-200 transform translate-y-2 transition-all duration-200">
                   <a href="#" className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg" onClick={()=>{navigate("/userprofile")}}>Profile</a>
-                  <a href="#" className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg">My Jobs</a>
+                  <a href="#" className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg" onClick={()=>{navigate("/userjobs")}}>My Jobs</a>
                   <a href="#" className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg">Settings</a>
                   <a href="#" className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg">Logout</a>
               </div>
@@ -74,25 +93,22 @@ const CivicSphereHomepage = () => {
         </div>
       </header>
 
-    <div className="py-12 flex justify-around">
+      <div className="py-12 flex justify-around">
       <div className="grid grid-cols-5 gap-4 max-w-5xl items-center text-center">
-          <div className="rounded-2xl overflow-hidden h-[204.05px] w-[143px]">
-              <img src="./image1.png" className="h-full w-full object-cover" />
+        {rotatedImages.map((img, index) => (
+          <div
+            key={index}
+            className={`rounded-2xl overflow-hidden transition-all duration-500 ${
+              index === 2 ? 'h-[330px] w-[180px]' : 
+              index === 1 || index === 3 ? 'h-[244px] w-[165px]' : 
+              'h-[204.05px] w-[143px]'
+            }`}
+          > 
+            <img src={img} className="h-full w-full object-cover" />
           </div>
-          <div className="rounded-2xl overflow-hidden h-[244px] w-[165px]">
-              <img src="./image2.png" className="h-full w-full object-cover" />
-          </div>
-          <div className="rounded-3xl overflow-hidden h-[330px] w-[180px]">
-              <img src="./image3.png" className="h-full w-full object-cover" />
-          </div>
-          <div className="rounded-2xl overflow-hidden h-[244px] w-[165px]">
-              <img src="./image4.png" alt="Plumbing services" className="h-full w-full object-cover" />
-          </div>
-          <div className="rounded-2xl overflow-hidden h-[204.05px] w-[143px]">
-              <img src="./image5.png" alt="repair services" className="h-full w-full object-cover" />
-          </div>
+        ))}
       </div>
-   </div>
+    </div>
 
       <div className="py-8 px-12 bg-gray-50">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
@@ -193,7 +209,6 @@ const CivicSphereHomepage = () => {
         </div>
       </div>
 
-      {/* Footer */}
       <footer className="bg-gray-50 py-12 px-12 border-t border-gray-200">
         <div className="max-w-6xl mx-auto grid grid-cols-4 gap-8">
           <div>

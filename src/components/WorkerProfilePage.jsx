@@ -2,7 +2,7 @@ import React, { useState,useEffect } from 'react';
 import { ChevronDown, Search, MessageCircle, User, Mail, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-const UserProfilePage = () => {
+const WorkerProfilePage = () => {
   const navigate=useNavigate();
   const [profileData, setProfileData] = useState({
     fullName: 'Alexa Rawles',
@@ -11,6 +11,7 @@ const UserProfilePage = () => {
     gender: '',
     country: '',
     language: '',
+    field: '',
     profilePicture: './image8.png',
     lastUpdated: '1 month ago'
   });
@@ -89,8 +90,8 @@ const UserProfilePage = () => {
             </button>
             {isUserMenuOpen && (
               <div className="absolute right-1 mt-2 w-44 bg-white shadow-lg rounded-lg p-2 border border-gray-200 transform translate-y-2 transition-all duration-200">
-                  <a href="#" className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg" onClick={()=>{navigate("/userprofile")}}>Profile</a>
-                  <a href="#" className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg" onClick={()=>{navigate("/userjobs")}}>My Jobs</a>
+                  <a href="#" className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg" onClick={()=>{navigate("/workerprofile")}}>Profile</a>
+                  <a href="#" className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg">My Jobs</a>
                   <a href="#" className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg">Settings</a>
                   <a href="#" className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg">Logout</a>
               </div>
@@ -129,6 +130,7 @@ const UserProfilePage = () => {
 
         <form onSubmit={handleSubmit} className="mt-8 max-w-4xl mx-auto">
           <div className="grid grid-cols-2 gap-6">
+            {/* Full Name */}
             <div>
               <label className="block text-gray-700 mb-2 text-left">Full Name</label>
               <input
@@ -139,6 +141,7 @@ const UserProfilePage = () => {
                 className="w-full p-3 bg-gray-100 rounded border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
+           {/* if editing is allowed, disabled is false and vice versa  */}
         
             <div>
               <label className="block text-gray-700 mb-2 text-left">Nick Name</label>
@@ -205,6 +208,23 @@ const UserProfilePage = () => {
                 <ChevronDown size={16} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
               </div>
             </div>
+            <div>
+            <label className="block text-gray-700 mb-2 text-left">Field</label>
+            <div className="relative">
+                <select
+                    value={profileData.field}
+                    onChange={(e) => handleInputChange('field', e.target.value)}
+                    disabled={!isEditing}
+                    className="w-full p-3 bg-gray-100 rounded border border-gray-200 appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                    <option value="est">Plumber</option>
+                    <option value="cst">Electrician</option>
+                    <option value="mst">Carpentary</option>
+                    <option value="pst">other</option>
+                </select>
+                <ChevronDown size={16} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
+            </div>
+        </div>
           </div>
 
           <div className="mt-8">
@@ -245,4 +265,4 @@ const UserProfilePage = () => {
   );
 };
 
-export default UserProfilePage;
+export default WorkerProfilePage;

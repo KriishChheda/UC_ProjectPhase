@@ -1,11 +1,20 @@
 import React from 'react';
 import { Search, MessageCircle, User, ChevronDown, ChevronRight, Facebook, Twitter, Instagram } from 'lucide-react';
 import {useState,useEffect} from "react";
+import { useNavigate } from 'react-router-dom';
 
-    import { useNavigate } from 'react-router-dom';
+
     const WorkerHomePage= () => {
+
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
     const navigate=useNavigate();
+    const [rotatedImages, setRotatedImages] = useState([
+        "./image1.png",
+        "./image2.png",
+        "./image3.png",
+        "./image4.png",
+        "./image5.png"
+      ]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -13,10 +22,21 @@ import {useState,useEffect} from "react";
         setIsUserMenuOpen(false);
       }
     };
-
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setRotatedImages((prevImages) => {
+        const newImages = [...prevImages];
+        newImages.push(newImages.shift()); // Rotate images
+        return newImages;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
 
   return (
     <div className="max-w-screen-xl mx-auto">
@@ -60,8 +80,8 @@ import {useState,useEffect} from "react";
             </button>
             {isUserMenuOpen && (
               <div className="absolute right-1 mt-2 w-44 bg-white shadow-lg rounded-lg p-2 border border-gray-200 transform translate-y-2 transition-all duration-200">
-                  <a href="#" className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg" onClick={()=>{navigate("/userprofile")}}>Profile</a>
-                  <a href="#" className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg">My Jobs</a>
+                  <a href="#" className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg" onClick={()=>{navigate("/workerprofile")}}>Profile</a>
+                  <a href="#" className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg" onClick={()=>{navigate("/workerjobs")}}>My Jobs</a>
                   <a href="#" className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg">Settings</a>
                   <a href="#" className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg">Logout</a>
               </div>
@@ -69,25 +89,23 @@ import {useState,useEffect} from "react";
           </div>
         </div>
       </header>
+
       <div className="py-12 flex justify-around">
       <div className="grid grid-cols-5 gap-4 max-w-5xl items-center text-center">
-          <div className="rounded-2xl overflow-hidden h-[204.05px] w-[143px]">
-              <img src="./image1.png" alt="Electrical services" className="h-full w-full object-cover" />
+        {rotatedImages.map((img, index) => (
+          <div
+            key={index}
+            className={`rounded-2xl overflow-hidden transition-all duration-500 ${
+              index === 2 ? 'h-[330px] w-[180px]' : 
+              index === 1 || index === 3 ? 'h-[244px] w-[165px]' : 
+              'h-[204.05px] w-[143px]'
+            }`}
+          >
+            <img src={img} className="h-full w-full object-cover" />
           </div>
-          <div className="rounded-2xl overflow-hidden h-[244px] w-[165px]">
-              <img src="./image2.png" alt="Cleaning services" className="h-full w-full object-cover" />
-          </div>
-          <div className="rounded-3xl overflow-hidden h-[330px] w-[180px]">
-              <img src="./image3.png" alt="Carpentry services" className="h-full w-full object-cover" />
-          </div>
-          <div className="rounded-2xl overflow-hidden h-[244px] w-[165px]">
-              <img src="./image4.png" alt="Plumbing services" className="h-full w-full object-cover" />
-          </div>
-          <div className="rounded-2xl overflow-hidden h-[204.05px] w-[143px]">
-              <img src="./image5.png" alt="repair services" className="h-full w-full object-cover" />
-          </div>
+        ))}
       </div>
-   </div>
+    </div>
       
       <div className="px-12 py-4">
         <h2 className="text-2xl font-bold mb-6 text-left text-[#220440]">Postings Near You</h2>
