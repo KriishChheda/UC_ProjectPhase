@@ -70,13 +70,13 @@ const AuthForm = () => {
 
             <div className="flex mb-6">
               <button 
-                className={`flex-1 py-2 px-4 rounded-l-[17px] ${!isSignIn ? 'bg-[#79698899] text-white' : 'bg-[#79698899]  text-white'}`}
+                className={`flex-1 py-2 px-4 rounded-l-[17px] ${isSignIn ? 'bg-[#79698899] text-white' : 'bg-[#220440] text-white'}`}
                 onClick={() => toggleForm('signup')}
               >
                 Sign up
               </button>
               <button 
-                className={`flex-1 py-2 px-4 rounded-r-[17px] ${isSignIn ? 'bg-[#220440] text-white' : 'bg-[#220440]  text-white'}`}
+                className={`flex-1 py-2 px-4 rounded-r-[17px] ${!isSignIn ? 'bg-[#79698899]  text-white' : 'bg-[#220440]  text-white'}`}
                 onClick={() => toggleForm('signin')}
               >
                 Sign in
