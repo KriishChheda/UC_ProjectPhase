@@ -27,8 +27,10 @@ const XIcon = () => (
 );
 
 const AuthForm = () => {
+
   const [isSignIn, setIsSignIn] = useState(true);
   const [userType, setUserType] = useState('hire'); // used to decide if the user is logining or the worker
+  const [loginData, setLoginData] = useState([]);
 
   const toggleForm = (type) => {
     setIsSignIn(type === 'signin');
