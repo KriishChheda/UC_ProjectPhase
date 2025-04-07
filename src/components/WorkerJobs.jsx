@@ -1,11 +1,13 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronDown, Search, MessageCircle, User } from "lucide-react";
+import { ChevronDown, Search, MessageCircle, User, Menu, X } from "lucide-react";
 
 const WorkerJobs = () => {
   // State for job listings and selected job
   const [selectedJob, setSelectedJob] = useState(null);
-  const navigate=useNavigate();
+  const navigate = useNavigate();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isJobSidebarOpen, setIsJobSidebarOpen] = useState(false);
   const [myJobs, setMyJobs] = useState([
     { 
       id: 1, 
@@ -24,9 +26,8 @@ const WorkerJobs = () => {
       offers: 0
     }
   ]);
-  // myJobs is an array of objects where each object is one job requested by the user.
+
   // State for service providers
-  // on the left side we have the jobs requested by the user , on the right side we have all the workers who are interested in the jobs
   const [serviceProviders, setServiceProviders] = useState([
     {
       id: 1,
@@ -50,10 +51,14 @@ const WorkerJobs = () => {
       image: '/api/placeholder/100/100'
     }
   ]);
-  // serviceProviders are the array of objects where each object is one worker who is willing to work
+
   // Handle job selection
   const handleJobSelect = (job) => {
     setSelectedJob(job);
+    // On mobile, when a job is selected, close the sidebar
+    if (window.innerWidth < 768) {
+      setIsJobSidebarOpen(false);
+    }
   };
 
   const renderStars = (rating) => {
@@ -62,7 +67,7 @@ const WorkerJobs = () => {
       stars.push(
         <svg 
           key={i} 
-          className={`w-5 h-5 ${i <= rating ? 'text-yellow-400' : 'text-gray-300'}`} 
+          className={`w-4 h-4 md:w-5 md:h-5 ${i <= rating ? 'text-yellow-400' : 'text-gray-300'}`} 
           fill="currentColor" 
           viewBox="0 0 20 20"
         >
@@ -73,104 +78,174 @@ const WorkerJobs = () => {
     return stars;
   };
 
-      const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-      useEffect(() => {
-        const handleClickOutside = (event) => {
-          if (!event.target.closest('.user-menu')) {
-            setIsUserMenuOpen(false);
-          }
-        };
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest('.user-menu')) {
+        setIsUserMenuOpen(false);
+      }
+    };
+
+    // Close mobile menus when resizing to desktop
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setIsMobileMenuOpen(false);
+        // On desktop, always show job sidebar
+        setIsJobSidebarOpen(true);
+      } else {
+        // On mobile, hide job sidebar by default
+        setIsJobSidebarOpen(false);
+      }
+    };
+
+    // Initial check
+    handleResize();
+
+    document.addEventListener('click', handleClickOutside);
+    window.addEventListener('resize', handleResize);
     
-        document.addEventListener('click', handleClickOutside);
-        return () => document.removeEventListener('click', handleClickOutside);
-      }, []);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   return (
-<div className="flex flex-col h-screen bg-white">
-
-    <header className="py-4 px-6 flex items-center justify-between">
-        <div className="flex items-center">
-          
-          <div className="mr-2">
-                <img src="./image.png" alt="CivicSphere Logo" className="w-[78px] h-[78px] mt-[46px]" />
+    <div className="flex flex-col h-screen bg-white">
+      {/* Mobile Navigation Menu */}
+      <div className={`fixed inset-0 bg-white z-50 transform transition-transform duration-300 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} lg:hidden`}>
+        <div className="p-6">
+          <div className="flex justify-between items-center mb-8">
+            <div className="flex items-center">
+              <img src="./image.png" alt="CivicSphere Logo" className="w-12 h-12" />
+              <h1 className="text-xl font-bold ml-2">
+                <span className="text-black">Civic</span>
+                <span className="bg-gradient-to-r from-[#220440] via-[#4F1E4F] to-[#7B375D] bg-clip-text text-transparent">Sphere</span>
+              </h1>
+            </div>
+            <button onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700 hover:bg-gray-100 p-2 rounded-full">
+              <X size={24} />
+            </button>
           </div>
-
-          <h1 className="text-3xl font-bold mt-[46px]">
-            <span className="text-black">Civic</span>
-            <span className="bg-gradient-to-r from-[#220440] via-[#4F1E4F] to-[#7B375D] bg-clip-text text-transparent">
-                  Sphere
-            </span>
-          </h1>
-
+          <nav className="space-y-4">
+            <a href="#" className="block py-2 text-lg font-medium text-gray-700 hover:text-[#220440]">Home</a>
+            <a href="#" onClick={() => { navigate("/needahand"); setIsMobileMenuOpen(false); }} className="block py-2 text-lg font-medium text-gray-700 hover:text-[#220440]">Post Request</a>
+            <a href="#" onClick={() => { navigate("/usermessage"); setIsMobileMenuOpen(false); }} className="block py-2 text-lg font-medium text-gray-700 hover:text-[#220440]">Chat</a>
+            <a href="#" onClick={() => { navigate("/userjobs"); setIsMobileMenuOpen(false); }} className="block py-2 text-lg font-medium text-gray-700 hover:text-[#220440]">My Jobs</a>
+            <a href="#" className="block py-2 text-lg font-medium text-gray-700 hover:text-[#220440]">Settings</a>
+            <a href="#" className="block py-2 text-lg font-medium text-gray-700 hover:text-[#220440]">Logout</a>
+          </nav>
+          <div className="mt-8">
+            <div className="bg-gray-200 rounded-full px-4 flex items-center h-12">
+              <input 
+                type="text" 
+                className="bg-transparent outline-none w-full" 
+                placeholder="Search..." 
+              />
+              <Search size={20} className="text-gray-500" />
+            </div>
+          </div>
         </div>
-        
-        <div className="flex items-center  mt-[61px]">
-          <div className="flex items-center text-gray-700 font-medium  ml-[30px] w-[189px]">
-            Home
-            <ChevronDown size={18} />
+      </div>
+      
+      {/* Header */}
+      <header className="py-4 px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between relative border-b border-gray-200">
+        <div className="flex items-center justify-between w-full md:w-auto">
+          <div className="flex items-center">
+            <div className="mr-2">
+              <img src="./image.png" alt="CivicSphere Logo" className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14" />
+            </div>
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">
+              <span className="text-black">Civic</span>
+              <span className="bg-gradient-to-r from-[#220440] via-[#4F1E4F] to-[#7B375D] bg-clip-text text-transparent">
+                Sphere
+              </span>
+            </h1>
           </div>
           
-          <div className="bg-gray-200 rounded-full px-4 flex items-center w-[460px] h-[55px]">
+          <button className="md:hidden p-2 hover:bg-gray-100 rounded-full" onClick={() => setIsMobileMenuOpen(true)}>
+            <Menu size={24} className="text-gray-700" />
+          </button>
+        </div>
+
+        <div className="hidden md:flex items-center flex-wrap gap-2 md:gap-4 mt-4 md:mt-0">
+          <div className="flex items-center text-gray-700 font-medium w-auto cursor-pointer">
+            Home <ChevronDown size={18} />
+          </div>
+
+          <div className="bg-gray-200 rounded-full px-4 flex items-center w-full md:w-[280px] lg:w-[430px] h-[40px]">
             <input 
               type="text" 
               className="bg-transparent outline-none w-full" 
-              placeholder="" 
+              placeholder="Search..." 
             />
             <Search size={20} className="text-gray-500" />
           </div>
-          
+
           <div className="flex items-center space-x-3 user-menu">
-            <button className="p-2 rounded-full bg-gray-200  ml-[10px]">
+            <button className="p-2 rounded-full bg-gray-200 hover:bg-gray-300" onClick={() => navigate("/usermessage")}>
               <MessageCircle size={20} className="text-gray-500" />
             </button>
-            <button className="p-2 rounded-full bg-gray-200" onClick={()=>{setIsUserMenuOpen(!isUserMenuOpen)}}>
+            <button className="p-2 rounded-full bg-gray-200 hover:bg-gray-300" onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}>
               <User size={20} className="text-gray-500" />
             </button>
             {isUserMenuOpen && (
-              <div className="absolute right-1 mt-2 w-44 bg-white shadow-lg rounded-lg p-2 border border-gray-200 transform translate-y-2 transition-all duration-200">
-                  <a href="#" className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg" onClick={()=>{navigate("/userprofile")}}>Profile</a>
-                  <a href="#" className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg">My Jobs</a>
-                  <a href="#" className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg">Settings</a>
-                  <a href="#" className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg">Logout</a>
+              <div className="absolute right-4 top-40 md:top-auto md:mt-40 w-44 bg-white shadow-lg rounded-lg p-2 border border-gray-200 transition-all duration-200 z-40">
+                <a href="#" className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg" onClick={() => navigate("/workerprofile")}>Profile</a>
+                <a href="#" className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg" onClick={() => navigate("/workerjobs")}>My Jobs</a>
+                <a href="#" className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg">Settings</a>
+                <a href="#" className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg">Logout</a>
               </div>
             )}
           </div>
         </div>
-    </header>
+      </header>
+
+      {/* Main content */}
       <div className="flex flex-1 overflow-hidden">
-        <div className="w-96  bg-gray-100">
-          <h2 className="p-4 text-2xl font-bold text-[#220440]">My Jobs</h2>
-          <div className="overflow-y-auto">
+        {/* Sidebar - On mobile: toggle with button, On desktop: always visible */}
+        <div className={`${isJobSidebarOpen ? 'block' : 'hidden'} md:block fixed md:static inset-0 z-20 md:z-0 overflow-y-auto w-full md:w-64 lg:w-96 bg-gray-100 md:max-h-[calc(100vh-115px)]`}>
+          <div className="flex justify-between items-center p-4">
+            <h2 className="text-xl md:text-2xl font-bold text-[#220440]">My Jobs</h2>
+            <button 
+              className="md:hidden p-2 rounded-full bg-gray-200 hover:bg-gray-300"
+              onClick={() => setIsJobSidebarOpen(false)}
+            >
+              <X size={20} className="text-gray-600" />
+            </button>
+          </div>
+          <div className="overflow-y-auto max-h-[calc(100vh-170px)]">
             {myJobs.map((job) => (
               <div 
                 key={job.id} 
-                className="p-4 m-4 bg-white rounded-lg shadow cursor-pointer"
+                className={`p-3 md:p-4 m-2 md:m-4 bg-white rounded-lg shadow cursor-pointer transition-all duration-200 ${selectedJob && selectedJob.id === job.id ? 'border-2 border-[#220440]' : ''}`}
                 onClick={() => handleJobSelect(job)}
               >
                 <div className="flex justify-between items-center mb-2">
-                  <h3 className="text-lg font-medium">{job.title}</h3>
+                  <h3 className="text-base md:text-lg font-medium">{job.title}</h3>
                   {job.offers > 0 && (
-                    <span className="px-3 py-1 text-xs text-white bg-green-500 rounded-full">
+                    <span className="px-2 py-1 text-xs text-white bg-green-500 rounded-full">
                       {job.offers} offers!
                     </span>
                   )}
                 </div>
-                <div className="flex items-center">
+                <div className="flex flex-wrap gap-y-1 gap-x-4">
                   <div className="flex items-center">
-                    <span className={`w-3 h-3 mr-2 rounded-full ${job.status === 'open' ? 'bg-green-500' : 'bg-yellow-500'}`}></span>
-                    <span className="text-sm capitalize">{job.status}</span>
+                    <span className={`w-2 h-2 md:w-3 md:h-3 mr-1 md:mr-2 rounded-full ${job.status === 'open' ? 'bg-green-500' : 'bg-yellow-500'}`}></span>
+                    <span className="text-xs md:text-sm capitalize">{job.status}</span>
                   </div>
-                  <div className="flex items-center ml-6">
-                    <svg className="w-4 h-4 mr-1 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                  <div className="flex items-center">
+                    <svg className="w-3 h-3 md:w-4 md:h-4 mr-1 text-red-500" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
                     </svg>
-                    <span className="text-sm">{job.location}</span>
+                    <span className="text-xs md:text-sm">{job.location}</span>
                   </div>
-                  <div className="flex items-center ml-6">
-                    <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div className="flex items-center">
+                    <svg className="w-3 h-3 md:w-4 md:h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <span className="text-sm">{job.timeframe}</span>
+                    <span className="text-xs md:text-sm">{job.timeframe}</span>
                   </div>
                 </div>
               </div>
@@ -178,9 +253,41 @@ const WorkerJobs = () => {
           </div>
         </div>
 
+        {/* Overlay for mobile job sidebar */}
+        {isJobSidebarOpen && (
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50 z-10 md:hidden"
+            onClick={() => setIsJobSidebarOpen(false)}
+          ></div>
+        )}
+
         {/* Main Area - Job Details */}
-        <div className="flex flex-col flex-1 p-6">
+        <div className="flex flex-col flex-1 p-3 md:p-6 overflow-y-auto">
+          {/* Mobile toggle for jobs list */}
+          <button
+            className="md:hidden mb-4 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg flex items-center justify-center w-full"
+            onClick={() => setIsJobSidebarOpen(!isJobSidebarOpen)}
+          >
+            {isJobSidebarOpen ? 'Hide Jobs' : 'Show Jobs'}
+          </button>
           
+          
+          
+          <div className="flex flex-col sm:flex-row gap-y-2 mb-4">
+            <div className="flex items-center sm:mr-8">
+
+              
+            </div>
+            
+            <div className="flex items-center">
+
+             
+            </div>
+          </div>
+          
+          {/* Service Providers */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mt-4 md:mt-8">
+          </div>
         </div>
       </div>
     </div>

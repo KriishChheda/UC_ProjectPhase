@@ -1,6 +1,5 @@
 import './App.css'
 import { Routes, Route } from "react-router-dom";
-
 import CivicSphereHomepage from './components/CivicSphereHomepage';
 import NeedAHandForm from './components/NeedAHandForm';
 import CivicSphereLanding from './components/CivicSphereLanding';
@@ -16,7 +15,7 @@ import { User } from 'lucide-react';
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<WorkerHomePage />} />
+      <Route path="/" element={<CivicSphereHomepage/>} />
       <Route path="/usersignuplogin" element={<AuthForm />} /> 
       <Route path="/needahand" element={<NeedAHandForm />} /> 
       <Route path="/usermessage" element={<CivicSphereMessaging />} /> 
