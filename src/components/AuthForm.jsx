@@ -1,4 +1,8 @@
 import React, { useState } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import { registerUser, loginUser } from '../apis/authServices';
+
 const GoogleIcon = () => (
   <svg viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg">
     <path
@@ -28,10 +32,44 @@ const XIcon = () => (
 
 const AuthForm = () => {
   const [isSignIn, setIsSignIn] = useState(true);
-  const [userType, setUserType] = useState('hire'); // used to decide if the user is logining or the worker
+  const [userType, setUserType] = useState('hire');
+  const [form, setForm] = useState({ name: '', email: '', password: '', confirm: '' });
+  const navigate = useNavigate(); // Hook for navigation
 
-  const toggleForm = (type) => {
-    setIsSignIn(type === 'signin');
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async () => {
+    try {
+      let response;
+      if (isSignIn) {
+        response = await loginUser(form.email, form.password);
+      } else {
+        if (form.password !== form.confirm) {
+          alert('Passwords do not match');
+          return;
+        }
+        const role = userType === 'hire' ? 'customer' : 'worker';
+        response = await registerUser(form.name, form.email, form.password, role);
+      }
+
+      // Log the response to see if it's a success or failure
+      console.log(response);
+      if (response) {
+        const { role } = response;
+
+        // Redirect based on the user role
+        if (role === 'worker') {
+          navigate('/worker-homepage'); // Redirect to worker homepage
+        } else {
+          navigate('/customer-homepage'); // Redirect to customer homepage
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Login/Signup failed');
+    }
   };
 
   return (
@@ -39,13 +77,11 @@ const AuthForm = () => {
       <div className="bg-white rounded-lg shadow-lg w-full max-w-4xl overflow-hidden">
         <div className="flex flex-col md:flex-row">
           <div className="w-full md:w-1/2 flex items-center justify-center p-8">
-            <div className="w-full h-full flex items-center justify-center">
-              <img src="./image10.png" alt="Characters illustration" className="max-w-full max-h-full" />
-            </div>
+            <img src="./image10.png" alt="Characters illustration" className="max-w-full max-h-full" />
           </div>
 
           <div className="w-full md:w-1/2 p-8">
-            <h2 className="text-2xl font-bold text-center mb-8">LOGIN TO CONTINUE</h2>
+            <h2 className="text-2xl font-bold text-center mb-8">{isSignIn ? 'LOGIN TO CONTINUE' : 'SIGN UP TO CONTINUE'}</h2>
 
             <div className="space-y-3 mb-6">
               <button className="w-full py-2 px-4 border border-black rounded-full flex items-center justify-evenly">
@@ -69,46 +105,66 @@ const AuthForm = () => {
             </div>
 
             <div className="flex mb-6">
-              <button 
-                className={`flex-1 py-2 px-4 rounded-l-[17px] ${!isSignIn ? 'bg-[#79698899] text-white' : 'bg-[#79698899]  text-white'}`}
-                onClick={() => toggleForm('signup')}
+              <button
+                className={`flex-1 py-2 px-4 rounded-l-[17px] ${!isSignIn ? 'bg-[#79698899] text-white' : 'bg-[#79698899] text-white'}`}
+                onClick={() => setIsSignIn(false)}
               >
                 Sign up
               </button>
-              <button 
-                className={`flex-1 py-2 px-4 rounded-r-[17px] ${isSignIn ? 'bg-[#220440] text-white' : 'bg-[#220440]  text-white'}`}
-                onClick={() => toggleForm('signin')}
+              <button
+                className={`flex-1 py-2 px-4 rounded-r-[17px] ${isSignIn ? 'bg-[#220440] text-white' : 'bg-[#220440] text-white'}`}
+                onClick={() => setIsSignIn(true)}
               >
                 Sign in
               </button>
             </div>
 
             <div className="space-y-4 mb-6">
-              <input 
-                type="text" 
-                placeholder="Username" 
-                className="w-full px-4 py-2 bg-gray-100 rounded-[17px]"
-              />
-              <input 
-                type="password" 
-                placeholder="Password" 
-                className="w-full px-4 py-2 bg-gray-100 rounded-[17px]"
-              />
-              
+              {/* Show name input only if it's sign up */}
               {!isSignIn && (
-                <input 
-                  type="password" 
-                  placeholder="Confirm Password" 
+                <input
+                  type="text"
+                  name='name'
+                  value={form.name}
+                  onChange={handleChange}
+                  placeholder="Name"
+                  className="w-full px-4 py-2 bg-gray-100 rounded-[17px]"
+                />
+              )}
+              <input
+                type="email"
+                placeholder="Email"
+                name='email'
+                value={form.email}
+                onChange={handleChange}
+                className="w-full px-4 py-2 bg-gray-100 rounded-[17px]"
+              />
+              <input
+                type="password"
+                placeholder="Password"
+                name='password'
+                value={form.password}
+                onChange={handleChange}
+                className="w-full px-4 py-2 bg-gray-100 rounded-[17px]"
+              />
+              {/* Show confirm password input only if it's sign up */}
+              {!isSignIn && (
+                <input
+                  type="password"
+                  name='confirm'
+                  value={form.confirm}
+                  onChange={handleChange}
+                  placeholder="Confirm Password"
                   className="w-full px-4 py-2 bg-gray-100 rounded-lg"
                 />
               )}
-              
               {isSignIn && (
                 <div className="text-right">
                   <a href="#" className="text-sm text-blue-600">Forgot Password?</a>
                 </div>
               )}
-              
+
+              {/* Show userType radio buttons only if it's sign up */}
               {!isSignIn && (
                 <div className="flex space-x-6 mt-4">
                   <label className="flex items-center space-x-2">
@@ -135,7 +191,10 @@ const AuthForm = () => {
               )}
             </div>
 
-            <button className="w-full py-3 px-4 bg-[#220440] text-white rounded-[17px]">
+            <button 
+              onClick={handleSubmit}
+              className="w-full py-3 px-4 bg-[#220440] text-white rounded-[17px]"
+            >
               {isSignIn ? 'Sign in' : 'Sign up'}
             </button>
           </div>
@@ -144,5 +203,6 @@ const AuthForm = () => {
     </div>
   );
 };
+
 
 export default AuthForm;

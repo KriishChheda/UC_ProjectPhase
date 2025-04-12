@@ -15,8 +15,10 @@ import { User } from 'lucide-react';
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<CivicSphereHomepage/>} />
-      <Route path="/usersignuplogin" element={<AuthForm />} /> 
+      <Route path="/" element={<CivicSphereLanding />} />
+      <Route path="/usersignuplogin" element={<AuthForm />} />
+      <Route path="/customer-homepage" element={<CivicSphereHomepage/>} /> 
+      <Route path="/worker-homepage" element={<WorkerHomePage />} />
       <Route path="/needahand" element={<NeedAHandForm />} /> 
       <Route path="/usermessage" element={<CivicSphereMessaging />} /> 
       <Route path="/workermessage" element={<CivicSphereWorkerMessaging />} /> 
