@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronDown, Search, MessageCircle, User, Menu, X } from "lucide-react";
+import useAuthStore from '../store/authStore';
 
 const CivicSphereJobs = () => {
   // State for job listings and selected job
@@ -8,6 +9,7 @@ const CivicSphereJobs = () => {
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isJobSidebarOpen, setIsJobSidebarOpen] = useState(false);
+  const { logout } = useAuthStore();
   const [myJobs, setMyJobs] = useState([
     { 
       id: 1, 
@@ -51,6 +53,11 @@ const CivicSphereJobs = () => {
       image: '/api/placeholder/100/100'
     }
   ]);
+
+  const handleLogout = () => {
+    logout();
+    setTimeout(() => navigate("/usersignuplogin"), 0);
+  }
 
   // Handle job selection
   const handleJobSelect = (job) => {
@@ -134,7 +141,9 @@ const CivicSphereJobs = () => {
             <a href="#" onClick={() => { navigate("/usermessage"); setIsMobileMenuOpen(false); }} className="block py-2 text-lg font-medium text-gray-700 hover:text-[#220440]">Chat</a>
             <a href="#" onClick={() => { navigate("/userjobs"); setIsMobileMenuOpen(false); }} className="block py-2 text-lg font-medium text-gray-700 hover:text-[#220440]">My Jobs</a>
             <a href="#" className="block py-2 text-lg font-medium text-gray-700 hover:text-[#220440]">Settings</a>
-            <a href="#" className="block py-2 text-lg font-medium text-gray-700 hover:text-[#220440]">Logout</a>
+            <a href="#" className="block py-2 text-lg font-medium text-gray-700 hover:text-[#220440]"
+            onClick={(e) => { e.preventDefault(); handleLogout(); }}
+            >Logout</a>
           </nav>
           <div className="mt-8">
             <div className="bg-gray-200 rounded-full px-4 flex items-center h-12">
@@ -195,7 +204,9 @@ const CivicSphereJobs = () => {
                 <a href="#" className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg" onClick={() => navigate("/userprofile")}>Profile</a>
                 <a href="#" className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg" onClick={() => navigate("/userjobs")}>My Jobs</a>
                 <a href="#" className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg">Settings</a>
-                <a href="#" className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg">Logout</a>
+                <a href="#" className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg"
+                onClick={(e) => { e.preventDefault(); handleLogout(); }}
+                >Logout</a>
               </div>
             )}
           </div>

@@ -8,25 +8,29 @@ const API = axios.create({
   },
 });
 
-// Request interceptor: add access token to headers
+// ✅ Skip token for these endpoints
+const isPublicRoute = (url) =>
+  url.includes('/auth/login') || url.includes('/auth/register') || url.includes('/auth/token/refresh');
+
 API.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('accessToken');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    if (!isPublicRoute(config.url)) {
+      const token = localStorage.getItem('accessToken');
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
     }
     return config;
   },
   (error) => Promise.reject(error)
 );
 
-// Response interceptor: refresh token on 401 error
+// 🔁 Refresh token on 401
 API.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
-    // Check for 401 and prevent infinite loop
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&
@@ -42,10 +46,10 @@ API.interceptors.response.use(
         localStorage.setItem('accessToken', newAccess);
 
         originalRequest.headers.Authorization = `Bearer ${newAccess}`;
-        return axios(originalRequest); // retry original request
+        return axios(originalRequest);
       } catch (refreshErr) {
         console.error('Token refresh failed:', refreshErr);
-        // Optional: redirect to login or logout user here
+        // Optional: Logout or redirect to login
       }
     }
 

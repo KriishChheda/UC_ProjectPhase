@@ -1,21 +1,33 @@
-import React from 'react';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Navigate, useNavigate } from 'react-router-dom';
+import useAuthStore from '../store/authStore';
 import { Search, MessageCircle, User, ChevronDown, Facebook, Twitter, Instagram } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 
 const CivicSphereHomepage = () => {
   const navigate = useNavigate();
+  const { user, isAuthenticated, loading, logout } = useAuthStore();
+
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [visibleCount, setVisibleCount] = useState(5);
-
   const [rotatedImages, setRotatedImages] = useState([
-    "./image1.png",
-    "./image2.png",
-    "./image3.png",
-    "./image4.png",
-    "./image5.png"
+    './image1.png',
+    './image2.png',
+    './image3.png',
+    './image4.png',
+    './image5.png'
   ]);
+  const [shouldRedirect, setShouldRedirect] = useState(false);
+
+  useEffect(() => {
+    if (!isAuthenticated && !loading) {
+      setShouldRedirect(true);
+    }
+  }, [isAuthenticated, loading]);
+
+  if (shouldRedirect) {
+    <Navigate to="/usersignuplogin" replace />;
+  }
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -23,7 +35,6 @@ const CivicSphereHomepage = () => {
         setIsUserMenuOpen(false);
       }
     };
-
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
@@ -41,17 +52,23 @@ const CivicSphereHomepage = () => {
 
   useEffect(() => {
     const updateVisibleCount = () => {
-      const width = window.innerWidth
-      if (width < 640) setVisibleCount(3)
-      else if (width < 768) setVisibleCount(3)
-      else if (width < 1024) setVisibleCount(4)
-      else setVisibleCount(5)
-    }
-  
-    updateVisibleCount()
-    window.addEventListener('resize', updateVisibleCount)
-    return () => window.removeEventListener('resize', updateVisibleCount)
-  }, [])
+      const width = window.innerWidth;
+      if (width < 640) setVisibleCount(3);
+      else if (width < 768) setVisibleCount(3);
+      else if (width < 1024) setVisibleCount(4);
+      else setVisibleCount(5);
+    };
+
+    updateVisibleCount();
+    window.addEventListener('resize', updateVisibleCount);
+    return () => window.removeEventListener('resize', updateVisibleCount);
+  }, []);
+
+  const handleLogout = () => {
+    logout();
+    setTimeout(() => navigate('/usersignuplogin'), 0);
+  };
+
 
   return (
     <div className="bg-white min-h-screen">
@@ -78,7 +95,13 @@ const CivicSphereHomepage = () => {
             <a href="#" onClick={() => { navigate("/usermessage"); setIsMobileMenuOpen(false); }} className="block py-2 text-lg font-medium text-gray-700 hover:text-[#220440]">Chat</a>
             <a href="#" onClick={() => { navigate("/userjobs"); setIsMobileMenuOpen(false); }} className="block py-2 text-lg font-medium text-gray-700 hover:text-[#220440]">My Jobs</a>
             <a href="#" className="block py-2 text-lg font-medium text-gray-700 hover:text-[#220440]">Settings</a>
-            <a href="#" className="block py-2 text-lg font-medium text-gray-700 hover:text-[#220440]">Logout</a>
+            <a href="#" 
+                className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg"
+                onClick={(e) => { e.preventDefault(); setIsMobileMenuOpen(false); handleLogout(); }}
+                
+              >
+                Logout
+            </a>
           </nav>
           <div className="mt-8">
             <div className="bg-gray-200 rounded-full px-4 flex items-center h-12">
@@ -105,8 +128,10 @@ const CivicSphereHomepage = () => {
                 Sphere
               </span>
             </h1>
+            
           </div>
           
+            
           <button className="md:hidden p-2" onClick={() => setIsMobileMenuOpen(true)}>
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -132,6 +157,7 @@ const CivicSphereHomepage = () => {
             <button className="p-2 rounded-full bg-gray-200" onClick={() => navigate("/usermessage")}>
               <MessageCircle size={20} className="text-gray-500" />
             </button>
+            <div className='text-gray-700 font-medium w-auto'>Hello, {user?.name} </div>
             <button className="p-2 rounded-full bg-gray-200" onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}>
               <User size={20} className="text-gray-500" />
             </button>
@@ -140,7 +166,13 @@ const CivicSphereHomepage = () => {
                 <a href="#" className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg" onClick={() => navigate("/userprofile")}>Profile</a>
                 <a href="#" className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg" onClick={() => navigate("/userjobs")}>My Jobs</a>
                 <a href="#" className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg">Settings</a>
-                <a href="#" className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg">Logout</a>
+                <a href="#" 
+                    onClick={(e) => { e.preventDefault(); setIsMobileMenuOpen(false); handleLogout(); }}
+                    
+                    className="block py-2 text-lg font-medium text-gray-700 hover:text-[#220440]"
+                  >
+                    Logout
+                </a>
               </div>
             )}
           </div>

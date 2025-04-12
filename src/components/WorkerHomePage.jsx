@@ -1,22 +1,51 @@
-import React from 'react';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Navigate } from 'react-router-dom';
+import useAuthStore from '../store/authStore';
+import API from '../api';
 import { Search, MessageCircle, User, ChevronDown, Facebook, Twitter, Instagram } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import JobDetailsModal from './JobDetailsModal';
 
 
-    const WorkerHomePage= () => {
+const WorkerHomePage = () => {
   const navigate = useNavigate();
+  const { user, isAuthenticated, loading, logout } = useAuthStore();
+  const [shouldRedirect, setShouldRedirect] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [visibleCount, setVisibleCount] = useState(5);
-
+  const [selectedJob, setSelectedJob] = useState(null);
   const [rotatedImages, setRotatedImages] = useState([
-    "./image1.png",
-    "./image2.png",
-    "./image3.png",
-    "./image4.png",
-    "./image5.png"
+    './image1.png',
+    './image2.png',
+    './image3.png',
+    './image4.png',
+    './image5.png'
   ]);
+  const [jobList, setJobList] = useState([]);
+
+  useEffect(() => {
+    if (!isAuthenticated && !loading) {
+      setShouldRedirect(true);
+    }
+  }, [isAuthenticated, loading]);
+
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        const res = await API.get('/jobs');
+        setJobList(res.data);
+        console.log(res.data);
+      } catch (err) {
+        console.error('Failed to fetch jobs:', err);
+
+      }
+    };
+    fetchJobs();
+  }, []);
+
+  if (shouldRedirect) {
+    return <Navigate to="/usersignuplogin" replace />;
+  }
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -24,11 +53,9 @@ import { useNavigate } from 'react-router-dom';
         setIsUserMenuOpen(false);
       }
     };
-
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
-  
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -41,20 +68,39 @@ import { useNavigate } from 'react-router-dom';
     return () => clearInterval(interval);
   }, []);
 
-
   useEffect(() => {
     const updateVisibleCount = () => {
-      const width = window.innerWidth
-      if (width < 640) setVisibleCount(3)
-      else if (width < 768) setVisibleCount(3)
-      else if (width < 1024) setVisibleCount(4)
-      else setVisibleCount(5)
-    }
+      const width = window.innerWidth;
+      if (width < 640) setVisibleCount(3);
+      else if (width < 768) setVisibleCount(3);
+      else if (width < 1024) setVisibleCount(4);
+      else setVisibleCount(5);
+    };
+    updateVisibleCount();
+    window.addEventListener('resize', updateVisibleCount);
+    return () => window.removeEventListener('resize', updateVisibleCount);
+  }, []);
+
+  const handleLogout = () => {
+    logout();
+    setTimeout(() => navigate('/usersignuplogin'), 0);
+  };
+
+  const timeAgo = (timestamp) => {
+    const now = new Date();
+    const posted = new Date(timestamp);
+    const seconds = Math.floor((now - posted) / 1000);
   
-    updateVisibleCount()
-    window.addEventListener('resize', updateVisibleCount)
-    return () => window.removeEventListener('resize', updateVisibleCount)
-  }, [])
+    if (seconds < 60) return 'Just now';
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes} min ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours} hr ago`;
+    const days = Math.floor(hours / 24);
+    if (days < 7) return `${days} days ago`;
+    return `on ${posted.toLocaleDateString()}`;
+  };
+  
 
   return (
     <div className="bg-white min-h-screen">
@@ -81,15 +127,11 @@ import { useNavigate } from 'react-router-dom';
             <a href="#" onClick={() => { navigate("/usermessage"); setIsMobileMenuOpen(false); }} className="block py-2 text-lg font-medium text-gray-700 hover:text-[#220440]">Chat</a>
             <a href="#" onClick={() => { navigate("/userjobs"); setIsMobileMenuOpen(false); }} className="block py-2 text-lg font-medium text-gray-700 hover:text-[#220440]">My Jobs</a>
             <a href="#" className="block py-2 text-lg font-medium text-gray-700 hover:text-[#220440]">Settings</a>
-            <a href="#" className="block py-2 text-lg font-medium text-gray-700 hover:text-[#220440]">Logout</a>
+            <a href="#" className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg" onClick={(e) => { e.preventDefault(); setIsMobileMenuOpen(false); handleLogout(); }}>Logout</a>
           </nav>
           <div className="mt-8">
             <div className="bg-gray-200 rounded-full px-4 flex items-center h-12">
-              <input 
-                type="text" 
-                className="bg-transparent outline-none w-full" 
-                placeholder="Search..." 
-              />
+              <input type="text" className="bg-transparent outline-none w-full" placeholder="Search..." />
               <Search size={20} className="text-gray-500" />
             </div>
           </div>
@@ -135,6 +177,7 @@ import { useNavigate } from 'react-router-dom';
             <button className="p-2 rounded-full bg-gray-200" onClick={() => navigate("/usermessage")}>
               <MessageCircle size={20} className="text-gray-500" />
             </button>
+            <div className='text-gray-700 font-medium w-auto'>Hello, {user?.name} </div>
             <button className="p-2 rounded-full bg-gray-200" onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}>
               <User size={20} className="text-gray-500" />
             </button>
@@ -143,7 +186,16 @@ import { useNavigate } from 'react-router-dom';
                 <a href="#" className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg" onClick={() => navigate("/workerprofile")}>Profile</a>
                 <a href="#" className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg" onClick={() => navigate("/workerjobs")}>My Jobs</a>
                 <a href="#" className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg">Settings</a>
-                <a href="#" className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg">Logout</a>
+                <a href="#" 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setIsMobileMenuOpen(false);
+                      handleLogout();
+                    }} 
+                    className="block py-2 text-lg font-medium text-gray-700 hover:text-[#220440]"
+                  >
+                    Logout
+                </a>
               </div>
             )}
           </div>
@@ -181,40 +233,48 @@ import { useNavigate } from 'react-router-dom';
     </div>
       
     <div className="px-4 md:px-12 py-4">
-  <h2 className="text-2xl font-bold mb-6 text-left text-[#220440]">Postings Near You</h2>
-
-        {/* Mobile: horizontal scroll | Desktop: grid layout */}
+        <h2 className="text-2xl font-bold mb-6 text-left text-[#220440]">Postings Near You</h2>
         <div className="md:grid md:grid-cols-3 md:gap-6 flex space-x-4 overflow-x-auto scrollbar-hide">
-          {[1, 2, 3, 4, 5, 6].map((item) => (
+          {jobList.map((job) => (
             <div
-              key={item}
+              key={job.job_id}
               className="min-w-[250px] md:min-w-0 flex-shrink-0 md:flex-shrink md:w-auto border rounded-xl shadow-sm p-6 bg-white"
             >
               <div className="flex items-center mb-4">
-                <div className="w-8 h-8 bg-gray-300 rounded-full mr-3"></div>
+                <div className="w-8 h-8 bg-gray-300 rounded-full mr-3">
+                  <img src={job.image || './default-avatar.png'} alt="User Avatar" className="w-full h-full rounded-full" />
+                </div>
                 <div className="text-left">
-                  <h3 className="font-semibold text-base">Fix My Sink</h3>
-                  <p className="text-sm text-gray-500">Posted 2 hours ago</p>
+                  <h3 className="font-semibold text-base">{job.title}</h3>
+                  <p className="text-sm text-gray-500 capitalize">{job.status}</p>
+                  <p className="text-sm text-gray-500">
+  Posted {timeAgo(job.created_at)}
+</p>
+
                 </div>
               </div>
 
               <div className="mb-6">
-                <p className="mb-1">Username</p>
+                <p className="mb-1">{job.customer_name || 'Customer'}</p>
                 <p className="flex items-center text-sm mb-1">
-                  <span className="text-red-500 mr-1">📍</span> Downtown
+                  <span className="text-red-500 mr-1">📍</span> {job.category}
                 </p>
                 <p className="flex items-center text-sm">
-                  <span className="text-green-600 mr-1">⏱</span> ASAP
+                  <span className="text-green-600 mr-1">⏱</span> {job.time_preference}
                 </p>
               </div>
 
-              <button className="bg-[#220440] text-white py-2 px-4 rounded-md w-full">
+              <button onClick={() => setSelectedJob(job)} className="bg-[#220440] text-white py-2 px-4 rounded-md w-full">
                 Job Details
               </button>
             </div>
           ))}
         </div>
       </div>
+
+      {selectedJob && (
+        <JobDetailsModal job={selectedJob} onClose={() => setSelectedJob(null)} />
+      )}
 
       <footer className="bg-gray-50 py-8 sm:py-12 px-4 sm:px-6 md:px-12 border-t border-gray-200">
               <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
