@@ -4,6 +4,8 @@ import useAuthStore from '../store/authStore';
 import API from '../api';
 import { Search, MessageCircle, User, ChevronDown, Facebook, Twitter, Instagram } from 'lucide-react';
 import JobDetailsModal from './JobDetailsModal';
+import { Player } from '@lottiefiles/react-lottie-player';
+
 
 
 const WorkerHomePage = () => {
@@ -14,6 +16,8 @@ const WorkerHomePage = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [visibleCount, setVisibleCount] = useState(5);
   const [selectedJob, setSelectedJob] = useState(null);
+  const [assignedJobs, setAssignedJobs] = useState([]);
+
   const [rotatedImages, setRotatedImages] = useState([
     './image1.png',
     './image2.png',
@@ -32,14 +36,31 @@ const WorkerHomePage = () => {
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const res = await API.get('/jobs');
-        setJobList(res.data);
-        console.log(res.data);
+        const [openRes, assignedRes] = await Promise.all([
+          API.get('/jobs/open/'),
+          API.get('/jobs/assigned/')
+        ]);
+    
+        // Remove any jobs that are already assigned
+        const filteredOpenJobs = openRes.data.filter(job => !job.worker);
+        const sortedOpenJobs = filteredOpenJobs.sort(
+          (a, b) => new Date(b.created_at) - new Date(a.created_at)
+        );
+    
+        const sortedAssignedJobs = assignedRes.data.sort(
+          (a, b) => new Date(b.created_at) - new Date(a.created_at)
+        );
+    
+        setJobList(sortedOpenJobs);
+        setAssignedJobs(sortedAssignedJobs);
+    
       } catch (err) {
         console.error('Failed to fetch jobs:', err);
-
       }
     };
+    
+    
+    
     fetchJobs();
   }, []);
 
@@ -231,50 +252,99 @@ const WorkerHomePage = () => {
         })}
       </div>
     </div>
-      
-    <div className="px-4 md:px-12 py-4">
-        <h2 className="text-2xl font-bold mb-6 text-left text-[#220440]">Postings Near You</h2>
-        <div className="md:grid md:grid-cols-3 md:gap-6 flex space-x-4 overflow-x-auto scrollbar-hide">
-          {jobList.map((job) => (
-            <div
-              key={job.job_id}
-              className="min-w-[250px] md:min-w-0 flex-shrink-0 md:flex-shrink md:w-auto border rounded-xl shadow-sm p-6 bg-white"
-            >
-              <div className="flex items-center mb-4">
-                <div className="w-8 h-8 bg-gray-300 rounded-full mr-3">
-                  <img src={job.image || './default-avatar.png'} alt="User Avatar" className="w-full h-full rounded-full" />
-                </div>
-                <div className="text-left">
-                  <h3 className="font-semibold text-base">{job.title}</h3>
-                  <p className="text-sm text-gray-500 capitalize">{job.status}</p>
-                  <p className="text-sm text-gray-500">
-  Posted {timeAgo(job.created_at)}
-</p>
 
-                </div>
-              </div>
-
-              <div className="mb-6">
-                <p className="mb-1">{job.customer_name || 'Customer'}</p>
-                <p className="flex items-center text-sm mb-1">
-                  <span className="text-red-500 mr-1">📍</span> {job.category}
-                </p>
-                <p className="flex items-center text-sm">
-                  <span className="text-green-600 mr-1">⏱</span> {job.time_preference}
-                </p>
-              </div>
-
-              <button onClick={() => setSelectedJob(job)} className="bg-[#220440] text-white py-2 px-4 rounded-md w-full">
-                Job Details
-              </button>
-            </div>
-          ))}
+    {assignedJobs.length > 0 && (
+  <div className="px-4 md:px-12 py-4">
+    <h2 className="text-2xl font-bold mb-6 text-left text-[#220440]">Jobs Assigned to You</h2>
+    <div className="md:grid md:grid-cols-2 md:gap-6 flex flex-col gap-4">
+      {assignedJobs.map((job) => (
+        <div
+          key={job.job_id}
+          className="border rounded-xl shadow-sm p-6 bg-blue-50 border-blue-300"
+        >
+          <h3 className="font-semibold text-lg mb-2">{job.title}</h3>
+          <p className="text-sm text-gray-700 mb-1">Category: {job.category}</p>
+          <p className="text-sm text-gray-700 mb-1">Time: {job.time_preference}</p>
+          <p className="text-sm text-gray-700 mb-3">Posted {timeAgo(job.created_at)}</p>
+          <button
+            className="bg-[#220440] text-white py-2 px-4 rounded-md"
+            onClick={() => setSelectedJob(job)}
+          >
+            View Details
+          </button>
         </div>
-      </div>
+      ))}
+    </div>
+  </div>
+)}
 
-      {selectedJob && (
-        <JobDetailsModal job={selectedJob} onClose={() => setSelectedJob(null)} />
-      )}
+      
+<div className="px-4 md:px-12 py-4">
+  <h2 className="text-2xl font-bold mb-6 text-left text-[#220440]">Postings Near You</h2>
+
+  {jobList.length > 0 ? (
+    <div className="md:grid md:grid-cols-3 md:gap-6 flex space-x-4 overflow-x-auto scrollbar-hide">
+      {jobList.map((job) => (
+        <div
+          key={job.job_id}
+          className="min-w-[250px] md:min-w-0 flex-shrink-0 md:flex-shrink md:w-auto border rounded-xl shadow-sm p-6 bg-white"
+        >
+          <div className="flex items-center mb-4">
+            <div className="w-8 h-8 bg-gray-300 rounded-full mr-3">
+              <img
+                src={job.image || './default-avatar.png'}
+                alt="User Avatar"
+                className="w-full h-full rounded-full"
+              />
+            </div>
+            <div className="text-left">
+              <h3 className="font-semibold text-base">{job.title}</h3>
+              <p className="text-sm text-gray-500 capitalize">{job.status}</p>
+              <p className="text-sm text-gray-500">Posted {timeAgo(job.created_at)}</p>
+            </div>
+          </div>
+
+          <div className="mb-6">
+            <p className="mb-1">{job.customer_name || 'Customer'}</p>
+            <p className="flex items-center text-sm mb-1">
+              <span className="text-red-500 mr-1">📍</span> {job.category}
+            </p>
+            <p className="flex items-center text-sm">
+              <span className="text-green-600 mr-1">⏱</span> {job.time_preference}
+            </p>
+          </div>
+
+          <button
+            onClick={() => setSelectedJob(job)}
+            className="bg-[#220440] text-white py-2 px-4 rounded-md w-full"
+          >
+            Job Details
+          </button>
+        </div>
+      ))}
+    </div>
+  ) : (
+    <div className="flex flex-col items-center justify-center py-10">
+      {/* Option 1: GIF animation */}
+      {/* <img src="/no-postings.gif" alt="No jobs" className="w-72 h-72 mb-4" /> */}
+
+      {/* Option 2: Lottie (uncomment if you're using lottie-react) */}
+      
+      <Player
+        autoplay
+        loop
+        src="/no-postings.json"
+        style={{ height: '300px', width: '300px' }}
+      />
+     
+
+      <p className="text-gray-500 text-lg mt-2 font-medium">No job postings available near you</p>
+    </div>
+  )}
+</div>
+
+{selectedJob && <JobDetailsModal job={selectedJob} onClose={() => setSelectedJob(null)} />}
+
 
       <footer className="bg-gray-50 py-8 sm:py-12 px-4 sm:px-6 md:px-12 border-t border-gray-200">
               <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">

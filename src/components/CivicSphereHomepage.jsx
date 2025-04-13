@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import useAuthStore from '../store/authStore';
 import { Search, MessageCircle, User, ChevronDown, Facebook, Twitter, Instagram } from 'lucide-react';
+import CivicSphereJobs from './CivicSphereJobs';
+import API from '../api';
 
 const CivicSphereHomepage = () => {
   const navigate = useNavigate();
   const { user, isAuthenticated, loading, logout } = useAuthStore();
-
+  const [hiredWorkers, setHiredWorkers] = useState([]);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [visibleCount, setVisibleCount] = useState(5);
@@ -62,6 +64,29 @@ const CivicSphereHomepage = () => {
     updateVisibleCount();
     window.addEventListener('resize', updateVisibleCount);
     return () => window.removeEventListener('resize', updateVisibleCount);
+  }, []);
+
+  useEffect(() => {
+    const fetchAssignedJobs = async () => {
+      try {
+        const response = await API.get('/jobs/');
+        const assigned = response.data.filter(job => job.status === 'assigned' && job.worker);
+  
+        const formatted = assigned.map(job => ({
+          jobTitle: job.title,
+          name: job.worker.user.name || "Worker", // Adjust depending on worker serializer
+          profession: job.worker.skills || "Service Provider", // Adjust if you store profession separately
+          rating: job.worker.average_rating || 4,
+          image: job.worker.user.profile_pic || "./default-avatar.png"
+        }));
+  
+        setHiredWorkers(formatted);
+      } catch (err) {
+        console.error("Failed to fetch hired workers:", err);
+      }
+    };
+  
+    fetchAssignedJobs();
   }, []);
 
   const handleLogout = () => {
@@ -209,6 +234,7 @@ const CivicSphereHomepage = () => {
       </div>
     </div>
 
+
       <div className="py-8 px-4 sm:px-6 md:px-12 bg-gray-50">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="max-w-md text-center md:text-left">
@@ -223,34 +249,41 @@ const CivicSphereHomepage = () => {
       </div>
 
       <div className="py-8 sm:py-10 px-4 sm:px-6 md:px-12">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-xl sm:text-2xl font-bold text-[#220440] mb-4 sm:mb-5">Hire Again</h2>
-          <div className="relative overflow-x-auto pb-4">
-            <div className="flex space-x-4 sm:space-x-6 scroll-smooth overflow-x-auto scrollbar scroll-m-0.5">
-              {[1, 2, 3].map((item) => (
-                <div key={item} className="min-w-[230px] sm:min-w-[270px] flex-shrink-0 border border-black rounded-xl shadow-md p-4">
-                  <div className="flex space-x-4">
-                    <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl overflow-hidden">
-                      <img src="./image7.png" alt="Worker profile" className="w-full h-full object-cover" />
-                    </div>
-                    <div>
-                      <p className="font-medium">Lorem Ipsum</p>
-                      <p className="text-gray-500 text-sm">Plumber</p>
-                      <div className="flex mt-1">
-                        {[1, 2, 3, 4, 5].map((star) => (
-                          <svg key={star} className={`w-4 h-4 ${star <= 4 ? "text-yellow-400" : "text-gray-300"}`} fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                          </svg>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
+  <div className="max-w-6xl mx-auto">
+    <h2 className="text-xl sm:text-2xl font-bold text-[#220440] mb-4 sm:mb-5">Hire Again</h2>
+    
+    {hiredWorkers.length > 0 ? (
+      <div className="flex space-x-4 sm:space-x-6 overflow-x-auto scrollbar-hide pb-4">
+        {hiredWorkers.map((worker, index) => (
+          <div key={index} className="min-w-[230px] sm:min-w-[270px] flex-shrink-0 border border-black rounded-xl shadow-md p-4">
+            <div className="flex space-x-4">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl overflow-hidden">
+                <img src={worker.image} alt={worker.name} className="w-full h-full object-cover" />
+              </div>
+              <div>
+                <p className="font-medium">{worker.name}</p>
+                <p className="text-gray-500 text-sm">{worker.profession}</p>
+                <div className="flex mt-1">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <svg key={star} className={`w-4 h-4 ${star <= worker.rating ? "text-yellow-400" : "text-gray-300"}`} fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  ))}
                 </div>
-              ))}
+              </div>
             </div>
           </div>
-        </div>
+        ))}
       </div>
+    ) : (
+      <div className="text-center text-gray-500 py-8">
+        <p className="text-lg font-medium">No workers hired yet</p>
+        <p className="text-sm text-gray-400">Your hired workers will appear here after assigning them to a job.</p>
+      </div>
+    )}
+  </div>
+</div>
+
 
       <footer className="bg-gray-50 py-8 sm:py-12 px-4 sm:px-6 md:px-12 border-t border-gray-200">
         <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
