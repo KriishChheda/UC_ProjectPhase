@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: 'http://localhost:8000', // Update if needed
+  baseURL: 'https://civicsphere.pythonanywhere.com', // Update if needed
   headers: {
     'Content-Type': 'application/json',
   },
@@ -40,7 +40,7 @@ API.interceptors.response.use(
 
       try {
         const refresh = localStorage.getItem('refreshToken');
-        const res = await axios.post('http://localhost:8000/auth/token/refresh/', { refresh });
+        const res = await axios.post('https://civicsphere.pythonanywhere.com/auth/token/refresh/', { refresh });
 
         const newAccess = res.data.access;
         localStorage.setItem('accessToken', newAccess);

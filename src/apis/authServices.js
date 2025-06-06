@@ -1,4 +1,4 @@
-import API from "../api";
+import API from "../";
 
 // Helper function to handle localStorage
 const storeAuthData = (access, refresh, user) => {
